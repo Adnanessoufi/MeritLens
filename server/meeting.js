@@ -3,9 +3,8 @@ import { meetingQuestionDuration } from '../shared/meeting-timer.js'
 import { id, now } from './db.js'
 import { getSession, sessionView, finalizeReport } from './flow.js'
 import { HttpError } from './extract.js'
-import { getVoiceProvider, getSpeechIdentity, synthesizeSpeech } from './speech.js'
-import {MEETING_MESSAGES_EN,meetingMessages} from '../shared/meeting-copy.js'
-export const MEETING_MESSAGES=MEETING_MESSAGES_EN
+import { getSpeechIdentity, synthesizeSpeech } from './speech.js'
+import {meetingMessages} from '../shared/meeting-copy.js'
 export const readMeeting = session => JSON.parse(session.meeting || '{}')
 function save(db, sessionId, meeting) { db.prepare('UPDATE sessions SET meeting = ? WHERE id = ?').run(JSON.stringify(meeting),sessionId) }
 function log(db, sessionId, type, details = {}) { db.prepare('INSERT INTO activity_events (id,session_id,type,created_at,details) VALUES (?,?,?,?,?)').run(id(),sessionId,type,now(),JSON.stringify(details)) }

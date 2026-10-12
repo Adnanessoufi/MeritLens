@@ -12,7 +12,7 @@ import { id, now, transaction } from './db.js'
 import { extractText, requiredText, HttpError, MAX_TEXT, MAX_DOCUMENT_TEXT } from './extract.js'
 import { createAI } from './ai.js'
 import { getAssignment, getSession, sessionView, makeBank, nextQuestion, finalizeReport } from './flow.js'
-import { languages, demoQuestion } from './languages.js'
+import { languages } from './languages.js'
 import { transferProfiles } from '../shared/transfer-fixtures.js'
 import { transferBank, responseStatus, skippedTransferAssessment, selectTransferConcepts } from './transfer.js'
 import { evidenceReceipt } from './evidence.js'
@@ -25,7 +25,6 @@ import { meetingQuestionDuration } from '../shared/meeting-timer.js'
 import { installMeetingRoutes, enforceMeetingDeadline, readMeeting } from './meeting.js'
 import { parseRubric } from './grading.js'
 import { installInterviewLifecycle } from './lifecycle.js'
-import { createAvatarService } from './avatar.js'
 import { QUESTION_DURATION_SECONDS, RESPONSE_TIME_OPTIONS, withQuestionTiming } from '../shared/timer.js'
 
 export function createApp(db, config, dependencies = {}) {
@@ -53,7 +52,6 @@ export function createApp(db, config, dependencies = {}) {
     }
     return audioCache.get(key)
   }
-  const avatar = createAvatarService(config, request, audioFor)
   const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024, files: 1, fields: 8, fieldSize: 250000 } })
   const lock = (key, fn) => async (req, res, next) => {
     const resource = typeof key === 'function' ? key(req) : key
@@ -579,18 +577,6 @@ export function createApp(db, config, dependencies = {}) {
     const grade=report?.grade_review?JSON.parse(report.grade_review):null
     res.json(report?.released_at||grade?.releasedAt ? { grade:grade?.releasedAt?{score:grade.score,total:grade.total,feedback:grade.notes}:null, available: true, status:grade?.releasedAt?'reviewed':report.review_status, feedback:report.released_at?report.feedback:'', releasedAt:report.released_at||grade?.releasedAt, followUpSessionId: followUp?.id || null }
       : { available: false })
-  })
-
-  app.post('/api/sessions/:id/avatar', (req, res) => {
-    const session = getSession(db, req.params.id)
-    requireCurrent(session, req.body.questionId)
-    if (req.body.retry !== undefined && typeof req.body.retry !== 'boolean') throw new HttpError(400, 'Retry must be true or false.')
-    res.json(avatar.start(session, req.body.retry === true))
-  })
-  app.get('/api/sessions/:id/avatar', async (req, res) => {
-    const session = getSession(db, req.params.id)
-    requireCurrent(session, req.query.questionId)
-    res.json(await avatar.status(session))
   })
 
   app.post('/api/sessions/:id/speech', lock(req => `speech:${req.params.id}`, async (req, res) => {

@@ -5,7 +5,6 @@ export function getConfig(env = process.env) {
     trustProxy: env.TRUST_PROXY === '1',
     demoAccessPassword: env.DEMO_ACCESS_PASSWORD || '',
     requireDemoAccessPassword: env.REQUIRE_DEMO_ACCESS_PASSWORD === 'true',
-    didKey: env.D_ID_API_KEY || '',
     openaiKey: env.OPENAI_API_KEY || '',
     model: env.OPENAI_MODEL || 'gpt-4.1-mini',
     voiceProvider: ['openai', 'elevenlabs', 'browser'].includes(env.VOICE_PROVIDER) ? env.VOICE_PROVIDER : '',

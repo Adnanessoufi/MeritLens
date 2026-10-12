@@ -1,4 +1,4 @@
-import React,{useEffect,useRef,useState} from 'react'
+import React,{useEffect,useState} from 'react'
 import {loadReferenceFaceEngine} from './reference-face.js'
 export function useReferenceFace(camera) {
  const [state,setState]=useState({status:'off'}),[version,setVersion]=useState(0)

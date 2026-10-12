@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useResource } from './api.js'
-import { Badge, Icon, Loading, ErrorNotice, ListMore } from './components.jsx'
+import { Icon, Loading, ErrorNotice, ListMore } from './components.jsx'
 import { transferWork } from '../shared/transfer-fixtures.js'
 const fraction=m=>m?.possible?m.earned+' / '+m.possible:'Not assessed'
 const points=n=>n===null||n===undefined?'Not assessed':n+' / 2'

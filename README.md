@@ -49,12 +49,12 @@ For the built app, run `npm run build` followed by `npm start`.
 | `public` | Images, fonts and local camera models |
 | `tests` | Backend and browser checks |
 | `scripts` | Setup, backups and demo preparation |
-| `docs` | Hosting setup and transfer validation |
+| `docs` | Transfer validation and setup notes |
 | `pitch` and `screenshots` | Project presentation |
 
 The camera models are needed for the local checks. API keys, databases, old notes and test output stay outside Git.
 
-## Tests and hosting
+## Tests
 
 ```bash
 npm test
@@ -62,12 +62,11 @@ npm run build
 npm run test:ui
 ```
 
-Browser tests use installed Chrome and a separate in-memory app on port 5184. Some older checks still refer to earlier layouts; the current workflow checks are in `tests/browser/flow.spec.js`.
+Browser tests use installed Chrome and a separate in-memory app on port 5184.
 
 The app uses React, Vite, Node.js, Express and SQLite. OpenAI handles analysis and transcription, ElevenLabs provides voice, and MediaPipe runs camera checks locally.
 
-- [Put the app online](docs/DEPLOYMENT.md)
 - [Transfer challenge and validation](docs/TRANSFER_CHALLENGE.md)
 - [Pitch](pitch/Meritlens_GigaHack_2026_Pitch.pdf)
 
-The teacher makes the final decision. Camera warnings are context, not proof of cheating. Student camera frames stay on the device; recorded answers go to the transcription provider. This is a hackathon demo, with a shared demo login available for hosting rather than separate teacher and student accounts.
+The teacher makes the final decision. Camera warnings are context, not proof of cheating.

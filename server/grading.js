@@ -4,7 +4,6 @@ import { HttpError, requiredText } from './extract.js'
 const string={type:'string'},strings={type:'array',items:string}
 const object=properties=>({type:'object',properties,required:Object.keys(properties),additionalProperties:false})
 const row=object({name:string,description:string,maxPoints:{type:'number'}})
-export const defaultRubric=[{name:'Correctness',description:'Claims, calculations and the solution are conceptually correct.',maxPoints:50},{name:'Reasoning',description:'Justifies decisions and explains the underlying ideas.',maxPoints:30},{name:'Task requirements',description:'Addresses the requested deliverables and constraints.',maxPoints:20}]
 export function parseRubric(value) {
  if(value===undefined)return []
  if(!Array.isArray(value)||value.length>12)throw new HttpError(400,'Use up to 12 grading criteria.')

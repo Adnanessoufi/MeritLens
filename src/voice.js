@@ -5,8 +5,6 @@ import { MAX_RECORDING_SECONDS } from '../shared/timer.js'
 export function useVoice({ session, config, avatar, onPresented, onEnded, onResume, onTranscript, onNoSpeech }) {
   const [speaking, setSpeaking] = useState(false)
   const [loadingSpeech,setLoadingSpeech]=useState(false)
-  const [videoActive, setVideoActive] = useState(false)
-  const videoRef = useRef(null)
   const lipLevel = useRef(0)
   const lipPose=useRef({roundness:0})
   const [recording, setRecording] = useState(false)
@@ -29,7 +27,6 @@ export function useVoice({ session, config, avatar, onPresented, onEnded, onResu
     stopLipMeter()
     state.lipContext?.close().catch(() => {})
     state.audio?.pause()
-    state.video?.pause()
     if (state.url) URL.revokeObjectURL(state.url)
     window.speechSynthesis?.cancel()
     state.recognition?.abort()
@@ -193,37 +190,16 @@ export function useVoice({ session, config, avatar, onPresented, onEnded, onResu
     finally {stopLipMeter();if(state.alive){setSpeaking(false);setLoadingSpeech(false)}}
   }
 
-  async function speak({ audioOnly = false } = {}) {
+  async function speak() {
     const playback = ++controls.current.playback
     stopLipMeter()
     controls.current.audio?.pause()
-    controls.current.video?.pause()
     window.speechSynthesis?.cancel()
-    setVideoActive(false)
     setError('')
     setSpeaking(true)
     setLoadingSpeech(true)
     try {
-      if (!audioOnly && !avatar?.voiceOnly && avatar?.status === 'ready' && videoRef.current) {
-        const video = videoRef.current
-        controls.current.video = video
-        video.onerror = () => { if (controls.current.alive) { setSpeaking(false); setLoadingSpeech(false); setVideoActive(false); setError('Avatar video could not play. Select Continue with voice only or See Question.') } }
-        const waiting = () => {
-          clearTimeout(controls.current.watchdog)
-          controls.current.watchdog = setTimeout(() => {
-            if (!controls.current.alive || playback !== controls.current.playback) return
-            video.pause(); setSpeaking(false); setLoadingSpeech(false); setVideoActive(false)
-            setError('Avatar playback is taking too long. Try Listen Again, Use voice only, or See Question.')
-          }, 15000)
-        }
-        video.onplaying = () => {clearTimeout(controls.current.watchdog);setLoadingSpeech(false)}
-        video.onwaiting = waiting
-        video.onended = presented
-        waiting()
-        video.currentTime = 0
-        setVideoActive(true)
-        await video.play()
-      } else if (config.voice !== 'browser') {
+      if (config.voice !== 'browser') {
         const state = controls.current
         const questionOnly=Boolean(session.meeting?.enabled&&state.hasPresented)
         if (!state.audio||questionOnly!==Boolean(state.questionOnlyAudio)) {
@@ -249,7 +225,6 @@ export function useVoice({ session, config, avatar, onPresented, onEnded, onResu
       setLoadingSpeech(false)
       stopLipMeter()
       clearTimeout(controls.current.watchdog)
-      setVideoActive(false)
       setError(`${error.message} You can always use See Question.`)
     }
   }
@@ -258,8 +233,6 @@ export function useVoice({ session, config, avatar, onPresented, onEnded, onResu
     controls.current.playback++
     clearTimeout(controls.current.watchdog)
     controls.current.audio?.pause()
-    controls.current.video?.pause()
-    setVideoActive(false)
     window.speechSynthesis?.cancel()
     setSpeaking(false)
     setLoadingSpeech(false)
@@ -373,6 +346,6 @@ export function useVoice({ session, config, avatar, onPresented, onEnded, onResu
     return () => clearTimeout(timeout)
   }, [recording])
 
-  return { speaking, loadingSpeech, lipLevel, lipPose, videoRef, videoActive, recording, level, requestingMicrophone, transcribing, error, speak, speakFeedback, stopSpeaking, startRecording, stopRecording,
+  return { speaking, loadingSpeech, lipLevel, lipPose, recording, level, requestingMicrophone, transcribing, error, speak, speakFeedback, stopSpeaking, startRecording, stopRecording,
     retryTranscription: recordingBlob ? () => transcribe(recordingBlob) : null }
 }

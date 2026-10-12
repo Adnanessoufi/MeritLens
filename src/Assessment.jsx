@@ -58,17 +58,6 @@ export function ReviewForm({ report, onSaved }) {
   return <section id="teacher-review" className="panel teacher-review"><div className="section-heading"><div><h2>Teacher review</h2></div><Badge status={status === 'reviewed' ? 'approved' : 'pending'}>{decisions[status]}</Badge></div><form onSubmit={save}><fieldset disabled={busy}><label>Review decision<select value={status} onChange={e => { setStatus(e.target.value); if (e.target.value === 'pending') setRelease(false) }}>{Object.entries(decisions).map(([key, title]) => <option value={key} key={key}>{title}</option>)}</select></label><div className="form-grid"><label>Private teacher notes<textarea value={notes} onChange={e => setNotes(e.target.value)} rows={4} maxLength={8000} placeholder="What does the evidence establish? What needs another conversation?" /></label><label>Feedback for the student<textarea value={feedback} onChange={e => setFeedback(e.target.value)} rows={4} maxLength={8000} placeholder="Recognize a strength and give a specific next step." /></label></div><label className="checkbox-label"><input type="checkbox" checked={release} disabled={status === 'pending'} onChange={e => setRelease(e.target.checked)} />Release feedback to the student</label></fieldset><ErrorNotice message={error} />{notice && <p className="success-notice" role="status">{notice}</p>}<div className="inline-actions"><Button type="submit" loading={busy}>Save review{release ? ' & release feedback' : ''}</Button><Button type="button" variant="white" onClick={() => window.print()}>Print / save report</Button></div></form></section>
 }
 
-export function ConceptEvidence({ report, onLocate, onOpenResponse }) {
-  const observed = new Set(report.answers.map(a => a.concept))
-  const expected = [...new Set([...(report.expectedConcepts || []), ...(report.isFollowUp ? [] : report.analysis.concepts.map(c => c.name))])]
-  const untested = expected.filter(name => !observed.has(name))
-  return <section className="concept-evidence-section"><div className="section-heading"><div><h2>What the conversation establishes</h2><p>Accuracy, reasoning, and application, considered across each concept’s responses.</p></div><span className="small muted">{observed.size} concepts discussed</span></div><div className="concept-evidence-grid">{report.conceptEvidence.map((item, i) => {
-    const source = report.analysis.concepts.find(c => c.name === item.concept)
-    const turns = report.answers.filter(a => a.concept === item.concept)
-    return <article id={'concept-evidence-' + i} className="panel concept-evidence" key={i}><div className="section-heading"><h3>{item.concept}</h3><Badge status={item.status} /></div>{source?.evidence && <><blockquote><span className="eyebrow">FROM THE SUBMISSION</span>{source.evidence}</blockquote><button type="button" className="text-button locate-source" onClick={() => onLocate(source.evidence, 'concept-evidence-' + i)}>Locate in the submitted work<Icon name="file" size={14} /></button></>}<div className="reasoning-trajectory" aria-label="Evidence across the conversation">{turns.map((turn, index) => <React.Fragment key={turn.id}>{index > 0 && <Icon name="arrow" size={13} />}<span><small>Response {turn.position}</small><Badge status={turn.status} /></span></React.Fragment>)}</div><p>{item.reasoning}</p><div className="evidence-links">{item.evidencePositions.map(p => <a className="text-button" key={p} href={'#evidence-' + p} onClick={e => { e.preventDefault(); if (onOpenResponse) return onOpenResponse(p); const node = document.getElementById('evidence-' + p); if (node) { node.open = true; node.scrollIntoView({ behavior: 'smooth', block: 'center' }) } }}>Response {p} <Icon name="arrow" size={13} /></a>)}</div><p className="next-step"><strong>Next step:</strong> {item.nextStep}</p></article>
-  })}</div>{untested.length > 0 && <div className="coverage-note"><Icon name="book" size={18} /><p><strong>Not discussed:</strong> {untested.join(', ')}. This interview provides no evidence about these concepts.</p></div>}{report.conceptEvidence.length === 0 && <p className="coverage-note">{report.defenceSkipped ? 'The defence was skipped. Review the work directly or arrange another conversation.' : 'This older report has per-response evidence below. Concept synthesis is available for new interviews.'}</p>}</section>
-}
-
 export function SubmissionInbox({ submissions, assignments, busyId, onFinish }) {
   const [limit,setLimit]=useState(3)
   const [search, setSearch] = useState('')
@@ -112,14 +101,6 @@ export function CohortInsights(){
  return <section className="cohort-insights">{data.concepts.length?<><div className="table-wrap"><table><thead><tr><th>Concept</th><th>Assignment</th><th>Mode</th><th>Demonstrated</th><th>Partial</th><th>Unclear</th></tr></thead><tbody>{data.concepts.slice(0,limit).map((c,i)=><tr key={i}><td>{c.concept}</td><td>{data.assignments.find(a=>a.id===c.assignmentId)?.title}</td><td>{reportModeLabel(c)}</td><td>{c.DEMONSTRATED}</td><td>{c.PARTIAL}</td><td>{c.UNCLEAR}</td></tr>)}</tbody></table></div><ListMore total={data.concepts.length} limit={limit} step={5} onChange={setLimit} label="concepts"/></>:<p>No interview concept evidence yet.</p>}</section>
 }
 
-export function SourceDocument({ report, highlight, onReturn }) {
-  let match = null
-  if (highlight) {
-    const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    try { match = new RegExp(highlight.trim().split(/\s+/).map(escape).join('\\s+'), 'i').exec(report.submittedText) } catch {}
-  }
-  return <details id="submitted-work" className="panel source-document"><summary>Read the submitted work <Icon name="file" size={17} /></summary><h3>{report.filename}</h3>{highlight && <div className="source-highlight-toolbar"><p className="source-highlight-note">The linked passage is highlighted below.</p><Button variant="white" className="button-small" onClick={onReturn}>Return to the observation<Icon name="back" size={15} /></Button></div>}<pre>{match ? <>{report.submittedText.slice(0, match.index)}<mark id="source-highlight">{match[0]}</mark>{report.submittedText.slice(match.index + match[0].length)}</> : report.submittedText}</pre></details>
-}
 export function FocusedFollowUp({ report, onSaved }) {
   const choices = report.availableFollowUpConcepts || [...new Set(report.conceptEvidence.map(c => c.concept))]
   const gaps = report.conceptEvidence.filter(c => c.status !== 'DEMONSTRATED').map(c => c.concept)

@@ -1,12 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { api, navigate, useResource, date, seconds } from './api.js'
+import React, { useEffect, useState } from 'react'
+import { api, navigate, useResource, date } from './api.js'
 import { Icon, Button, Badge, ErrorNotice, Loading, Empty, ListMore } from './components.jsx'
 import { CreateAssignment, AssignmentRubric, WorkGrade } from './Grading.jsx'
 import InterviewResults from './InterviewResults.jsx'
 import {reportModeLabel} from '../shared/report-results.js'
 import { ActivityEvidence } from './Integrity.jsx'
-import { ShowcaseEntry } from './Showcase.jsx'
-import { AssignmentSettings, TimingSelect, ReviewForm, ConceptEvidence, SubmissionInbox, ProviderSettings, CohortInsights, SourceDocument, FocusedFollowUp, FollowUpComparison, EvidenceReceiptCard } from './Assessment.jsx'
+import { AssignmentSettings, ReviewForm, SubmissionInbox, CohortInsights, FocusedFollowUp, FollowUpComparison, EvidenceReceiptCard } from './Assessment.jsx'
 
 export function TeacherDashboard({ config }) {
   const assignments = useResource('/assignments')

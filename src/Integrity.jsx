@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { api, useResource } from './api.js'
-import { Button, ErrorNotice, Icon, Badge } from './components.jsx'
+import { Button, ErrorNotice, Icon } from './components.jsx'
 import { CameraObservations } from './CameraObservations.jsx'
 import { CameraPreview } from './Camera.jsx'
 
