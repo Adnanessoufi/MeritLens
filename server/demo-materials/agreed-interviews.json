@@ -1,0 +1,239 @@
+{
+  "sample-matlab": {
+    "questions": [
+      {
+        "concept": "Slope",
+        "text": "If I give you two points, how do you find the slope?",
+        "expectedAnswer": "I divide the change in y by the change in x: (y2 - y1) / (x2 - x1). If both x-values are the same, the line is vertical and its slope is undefined.",
+        "anchor": "q4_slope"
+      },
+      {
+        "concept": "Point on a curve",
+        "text": "How do you check whether a point is on a curve?",
+        "expectedAnswer": "I put the point's x and y values into the equation. If the equation is true, the point is on the curve.",
+        "anchor": "q2_point"
+      },
+      {
+        "concept": "Y-axis crossing",
+        "text": "How do you find where a graph crosses the y-axis?",
+        "expectedAnswer": "I set x to zero and calculate y. The crossing point is (0, f(0)).",
+        "anchor": "q1_y_intercept"
+      },
+      {
+        "concept": "Function zeros",
+        "text": "What does a zero of a function mean?",
+        "expectedAnswer": "It is an x-value where the function equals zero. On the graph, it is a point on the x-axis.",
+        "anchor": "q3_all_roots"
+      },
+      {
+        "concept": "Tangent",
+        "text": "How does the derivative help you draw a tangent?",
+        "expectedAnswer": "The derivative gives the tangent's slope at the chosen point. I use that slope and the point to draw the line.",
+        "anchor": "q3_tangent_slope"
+      }
+    ],
+    "pairs": [
+      {
+        "concept": "Slope",
+        "originalQuestion": "If I give you two points, how do you find the slope?",
+        "changedScenario": "Now the points are (2,4) and (2,9).",
+        "transferQuestion": "What kind of line do you get?",
+        "expectedOriginal": "I divide the change in y by the change in x: (y2 - y1) / (x2 - x1).",
+        "expectedTransfer": "Both x-values are 2, so the line is vertical: x = 2. The slope is undefined because the usual formula would divide by zero.",
+        "invariant": "I divide the change in y by the change in x: (y2 - y1) / (x2 - x1).",
+        "changeType": "scenario",
+        "acceptableAlternatives": [
+          "Any mathematically or conceptually equivalent correct explanation in simple words."
+        ]
+      },
+      {
+        "concept": "Point on a curve",
+        "originalQuestion": "How do you check whether a point is on a curve?",
+        "changedScenario": "Now the curve is y = x^2.",
+        "transferQuestion": "Is the point (2,5) on it?",
+        "expectedOriginal": "I put its x and y values into the equation and check whether it is true.",
+        "expectedTransfer": "No. When x is 2, x squared is 4, but the point has y = 5. It does not satisfy the equation.",
+        "invariant": "I put its x and y values into the equation and check whether it is true.",
+        "changeType": "scenario",
+        "acceptableAlternatives": [
+          "Any mathematically or conceptually equivalent correct explanation in simple words."
+        ]
+      },
+      {
+        "concept": "Y-axis crossing",
+        "originalQuestion": "How do you find where a graph crosses the y-axis?",
+        "changedScenario": "The first function changes to f(x) = 2x^4 + 3x + 5.",
+        "transferQuestion": "Where does it cross the y-axis now?",
+        "expectedOriginal": "I set x to zero and calculate f(0). The point is (0, f(0)).",
+        "expectedTransfer": "I still set x to zero. This gives 5, so the crossing point is (0,5).",
+        "invariant": "I set x to zero and calculate f(0). The point is (0, f(0)).",
+        "changeType": "scenario",
+        "acceptableAlternatives": [
+          "Any mathematically or conceptually equivalent correct explanation in simple words."
+        ]
+      }
+    ]
+  },
+  "sample-thesis": {
+    "questions": [
+      {
+        "concept": "Research idea",
+        "text": "What's the main idea of your research?",
+        "expectedAnswer": "I want to detect fake face images. I test whether adding small noise clues to a normal image model improves detection. Combining several models gave my best result.",
+        "anchor": "Deepfake Image Detection"
+      },
+      {
+        "concept": "Research purpose",
+        "text": "Why does this matter? Can't we just ask an AI whether a picture is fake?",
+        "expectedAnswer": "Fake pictures can mislead people. My detector is also AI, but I test it on pictures with known labels so I can measure how often it is right or wrong, rather than simply trusting an answer.",
+        "anchor": "Spatial Rich Models"
+      },
+      {
+        "concept": "RGB and SRM",
+        "text": "You used two methods. What does each one help you see?",
+        "expectedAnswer": "The RGB model looks at how the picture appears. The SRM part brings out small noise patterns that may show how it was generated. Together, they give the detector different clues.",
+        "anchor": "SRM"
+      },
+      {
+        "concept": "Unseen images",
+        "text": "Your results are very high. How did you check that the model wasn't just memorising the training pictures?",
+        "expectedAnswer": "I used separate training and validation folds. I also kept the final 20,000 test pictures untouched until the model choices were finished. This helps check performance on unseen pictures, although it does not prove the model will work on every new dataset.",
+        "anchor": "20,000"
+      },
+      {
+        "concept": "Ensemble",
+        "text": "You mentioned an ensemble. What is that, and how did you combine the models' answers?",
+        "expectedAnswer": "An ensemble is several models working together. Each model gives probabilities for real and fake. I average those probabilities and choose the class with the higher average. This is called soft voting.",
+        "anchor": "soft"
+      },
+      {
+        "concept": "Real-world testing",
+        "text": "What would you still need to test before using this on real-world pictures?",
+        "expectedAnswer": "I would test pictures from other image generators and datasets. I would also test lower-quality and compressed pictures to see whether the results stay reliable.",
+        "anchor": "FFHQ"
+      }
+    ],
+    "pairs": [
+      {
+        "concept": "RGB and SRM",
+        "originalQuestion": "You used two methods. What does each one help you see?",
+        "changedScenario": "In a new test, adding SRM gives no improvement.",
+        "transferQuestion": "What would you do?",
+        "expectedOriginal": "The RGB model checks how the picture looks. The SRM branch brings out small noise patterns that may reveal generation traces. They can provide different clues.",
+        "expectedTransfer": "I would check that the comparison used the same data and conditions. If the extra branch still gives no useful improvement, I would consider keeping the simpler RGB model instead of adding complexity without a benefit.",
+        "invariant": "The RGB model checks how the picture looks. The SRM branch brings out small noise patterns that may reveal generation traces. They can provide different clues.",
+        "changeType": "scenario",
+        "acceptableAlternatives": [
+          "Any mathematically or conceptually equivalent correct explanation in simple words."
+        ]
+      },
+      {
+        "concept": "Unseen images",
+        "originalQuestion": "How did you check that the model wasn't just memorising the training pictures?",
+        "changedScenario": "You discover that the final test pictures were used in training by mistake.",
+        "transferQuestion": "How would you check the model now?",
+        "expectedOriginal": "I used separate training and validation folds and kept the final test set untouched until model choices were finished. That tests performance on unseen pictures, although it does not prove the model will work on every new dataset.",
+        "expectedTransfer": "The old test score is no longer a clean check. I would use a new test set that was never used for training or model selection, and evaluate the finished model on it.",
+        "invariant": "I used separate training and validation folds and kept the final test set untouched until model choices were finished. That tests performance on unseen pictures, although it does not prove the model will work on every new dataset.",
+        "changeType": "scenario",
+        "acceptableAlternatives": [
+          "Any mathematically or conceptually equivalent correct explanation in simple words."
+        ]
+      },
+      {
+        "concept": "Ensemble",
+        "originalQuestion": "You mentioned an ensemble. What is that, and how did you combine the models' answers?",
+        "changedScenario": "Two models give fake probabilities of 0.9 and 0.3.",
+        "transferQuestion": "With equal weights, what fake probability does their ensemble give?",
+        "expectedOriginal": "Several models work together. Each gives real and fake probabilities. I average those probabilities and use the class with the higher average. That is soft voting.",
+        "expectedTransfer": "I add them and divide by two: (0.9 + 0.3) / 2 = 0.6, or 60 percent.",
+        "invariant": "Several models work together. Each gives real and fake probabilities. I average those probabilities and use the class with the higher average. That is soft voting.",
+        "changeType": "scenario",
+        "acceptableAlternatives": [
+          "Any mathematically or conceptually equivalent correct explanation in simple words."
+        ]
+      }
+    ]
+  },
+  "sample-project": {
+    "questions": [
+      {
+        "concept": "Problem",
+        "text": "What problem does your app solve?",
+        "expectedAnswer": "Written work can look good even when the student does not understand it. Merit Lens adds a short interview about the student's own work so the teacher can see what they understand.",
+        "anchor": "A written assignment"
+      },
+      {
+        "concept": "Workflow",
+        "text": "How does someone use your app?",
+        "expectedAnswer": "The teacher creates a task. The student uploads their work and answers short questions. The app saves the answers and makes a report for the teacher.",
+        "anchor": "The teacher creates"
+      },
+      {
+        "concept": "Questions",
+        "text": "Where do the questions come from?",
+        "expectedAnswer": "The AI reads the student's uploaded work and picks important ideas from it. The teacher's instructions help guide the questions.",
+        "anchor": "AI reads"
+      },
+      {
+        "concept": "Final grade",
+        "text": "Who decides the final grade?",
+        "expectedAnswer": "The teacher. The AI can suggest a grade, but the teacher checks the evidence and can change it.",
+        "anchor": "teacher reviews"
+      },
+      {
+        "concept": "Camera warnings",
+        "text": "Does a camera warning prove cheating?",
+        "expectedAnswer": "No. The camera check can make mistakes. A warning only asks the teacher to look more closely; it is not proof.",
+        "anchor": "Camera processing"
+      },
+      {
+        "concept": "Limits",
+        "text": "What still needs improving?",
+        "expectedAnswer": "The avatar needs to look more natural. Camera checks and AI grading need wider testing. We also need proper login and access control before using it more widely.",
+        "anchor": "proper login"
+      }
+    ],
+    "pairs": [
+      {
+        "concept": "Problem",
+        "originalQuestion": "Why does your app add an interview after the written submission?",
+        "changedScenario": "A student's description looks excellent, but they cannot explain a main feature.",
+        "transferQuestion": "What should the report show?",
+        "expectedOriginal": "Written work can look good without real understanding. The interview checks whether the student can explain the ideas in their own work.",
+        "expectedTransfer": "It should record the missing or unclear explanation and the actual answer. The written work and the interview evidence are different. A weak explanation alone does not prove cheating or who wrote the work.",
+        "invariant": "Written work can look good without real understanding. The interview checks whether the student can explain the ideas in their own work.",
+        "changeType": "scenario",
+        "acceptableAlternatives": [
+          "Any mathematically or conceptually equivalent correct explanation in simple words."
+        ]
+      },
+      {
+        "concept": "Camera warnings",
+        "originalQuestion": "Does a camera warning prove cheating?",
+        "changedScenario": "A camera warning says there may be a phone, but the teacher checks and finds it was another object.",
+        "transferQuestion": "What should the teacher do?",
+        "expectedOriginal": "No. The camera can make mistakes. It only gives the teacher something to check.",
+        "expectedTransfer": "Treat it as a false warning and dismiss that concern. Do not lower the grade because of that mistaken signal; judge the actual work and answers.",
+        "invariant": "No. The camera can make mistakes. It only gives the teacher something to check.",
+        "changeType": "scenario",
+        "acceptableAlternatives": [
+          "Any mathematically or conceptually equivalent correct explanation in simple words."
+        ]
+      },
+      {
+        "concept": "Final grade",
+        "originalQuestion": "Who decides the final grade?",
+        "changedScenario": "The AI gives a low grade, but the submitted work meets the grading criteria.",
+        "transferQuestion": "What should the teacher do?",
+        "expectedOriginal": "The teacher. The AI suggests a grade, and the teacher checks the evidence and can change it.",
+        "expectedTransfer": "Check the work against the criteria, identify where the AI made a mistake, and correct the grade. The AI suggestion is not the final decision.",
+        "invariant": "The teacher. The AI suggests a grade, and the teacher checks the evidence and can change it.",
+        "changeType": "scenario",
+        "acceptableAlternatives": [
+          "Any mathematically or conceptually equivalent correct explanation in simple words."
+        ]
+      }
+    ]
+  }
+}

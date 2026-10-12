@@ -1,0 +1,21 @@
+import {test,expect} from '@playwright/test'
+
+test('old deletion notice does not return, assignments are compact cards, and the sample is project-based',async({page})=>{
+ await page.setViewportSize({width:1366,height:768})
+ const rows=await(await page.request.get('/api/assignments')).json()
+ for(const a of rows)if(a.id==='sample-python'||a.title.startsWith('Compact list QA'))await page.request.delete('/api/assignments/'+a.id)
+ await page.addInitScript(()=>sessionStorage.setItem('merit-lens-deleted-assignment',JSON.stringify({id:'yesterday',title:'Deleted yesterday'})))
+ await page.goto('/#/teacher')
+ await expect(page.getByText('Assignment deleted',{exact:true})).toHaveCount(0)
+ await expect(page.locator('.assignment-card-grid')).toBeVisible()
+ await expect(page.getByRole('link',{name:/Project demo defence/})).toBeVisible()
+ const widths=await page.locator('.assignment-card').evaluateAll(ns=>ns.map(n=>n.getBoundingClientRect().width))
+ expect(widths.every(w=>w<450)).toBe(true)
+ await page.screenshot({path:'.test-artifacts/screenshots/project-assignment-cards.png'})
+ await page.goto('/#/student/sample-python/demo')
+ await expect(page.getByRole('textbox',{name:'Assignment text',exact:true})).toHaveValue(/Merit Lens — project demo description/)
+ await expect(page.getByRole('combobox',{name:'Assignment',exact:true})).toHaveValue('sample-project')
+ await expect(page.getByText('Up to 6 questions',{exact:true})).toBeVisible()
+ const source=await page.getByRole('textbox',{name:'Assignment text',exact:true}).inputValue();expect(source).not.toMatch(/ISBN|reading-list/i)
+ await page.screenshot({path:'.test-artifacts/screenshots/project-sample-upload.png'})
+})

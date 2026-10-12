@@ -1,0 +1,19 @@
+# Assignment upload and rubric grading
+
+Teacher → Create assignment → Upload assignment reads PDF/DOCX/TXT using the existing extractor, then live AI proposes editable title, instructions summary, important concepts and grading criteria. Pasted/manual instructions remain supported. Step 2 reviews criterion descriptions/points and an optional private model answer. Creation requires the teacher's review checkbox. Existing assignments can add/edit criteria in Grading criteria. The uploaded full text is retained as analysis context; original file bytes are not retained. Scanned PDFs require OCR or pasted text.
+
+New live submissions with criteria receive a submitted-work assessment before interview generation. Teacher instructions/rubric/private reference are context; the student's document is never an answer key. Suspected mistakes guide source-specific questions. The submitted-work grade and explanation/application/consistency scores stay separate. Rubric/teacher context is snapshotted for new submissions, so later assignment edits do not change the original grading context.
+
+Work & grade in the report shows criterion points, rationales, literal submission quotes, concerns, and a draft total. AI results are suggestions. Teachers may edit all scores, must explicitly review and provide feedback, and separately choose whether to publish. Uncertain criteria or nonliteral evidence withhold the total for human review. A teacher can reanalyze older reports using their saved context, or the current rubric when no historic rubric exists; reanalysis resets grade approval. Grade approval/release is separate from the understanding evidence receipt.
+
+Private model answers are omitted from student assignment-list/detail and session responses. Published feedback only contains the teacher-approved total and written feedback. Like the rest of this hackathon prototype, teacher/student roles are UI routes rather than authenticated authorization; this is not a production access-control boundary.
+
+AI/voice settings live only in Teacher → Settings. The avatar label describes local lip animation. Production uses verified OpenAI analysis and voice, with new sessions in live mode. Historical session modes persist.
+
+Validation: 60 API checks passed including three grading checks (teacher upload and source redaction; score bounds/quote validation; human approval and release). Focused laptop Chrome flow passed for upload, editable criteria/reference, saving an assignment, grade edit/approval/publication controls and Settings; preview/grade AI outputs in that UI check are controlled fixtures. The minimal navigation check passed. Read-only production Chrome check passed on the real saved incorrect-work example, with no page errors or horizontal overflow and a matching receipt.
+
+Live extraction/scoring check: same design-explanation task and criteria, two fictional submissions. Correct design suggested 100/100; incorrect design 15/100 with specific dictionary, collision, duplicate/missing-key and testing errors flagged. This two-case check is not a general accuracy estimate. First run rejected an inexact quote and withheld the correct-work total; retained as grading-live-before-quote-selection.json. Evidence candidate selection was tightened, task clarified as design explanation rather than runtime verification, and the later live result is grading-live-validation.json.
+
+Reproduce: node --env-file-if-exists=.env scripts/grading-rehearsal.js (uses OpenAI credits); node --env-file-if-exists=.env scripts/prepare-grading-demo.js (adds only two fixed fictional demo records if absent); node node_modules/@playwright/test/cli.js test tests/browser/grading.spec.js. The two saved grade-only examples have no interview and establish no transfer result:
+- /#/teacher/report/grading-demo-correct-report
+- /#/teacher/report/grading-demo-incorrect-report

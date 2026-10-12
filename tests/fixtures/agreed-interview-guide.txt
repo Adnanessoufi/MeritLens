@@ -1,0 +1,146 @@
+INTERVIEW PREPARATION - QUESTIONS AND SAMPLE ANSWERS
+
+These are the question sets agreed in our conversation.
+The app update to use these sets and independent standard questions is still pending.
+
+MATLAB - 5 QUESTIONS
+
+1. If I give you two points, how do you find the slope?
+Answer: I divide the change in y by the change in x: (y2 - y1) / (x2 - x1). If both x-values are the same, the line is vertical and its slope is undefined.
+
+2. How do you check whether a point is on a curve?
+Answer: I put the point's x and y values into the equation. If the equation is true, the point is on the curve.
+
+3. How do you find where a graph crosses the y-axis?
+Answer: I set x to zero and calculate y. The crossing point is (0, f(0)).
+
+4. What does a zero of a function mean?
+Answer: It is an x-value where the function equals zero. On the graph, it is a point on the x-axis.
+
+5. How does the derivative help you draw a tangent?
+Answer: The derivative gives the tangent's slope at the chosen point. I use that slope and the point to draw the line.
+
+
+THESIS - 6 QUESTIONS
+
+1. What's the main idea of your research?
+Answer: I want to detect fake face images. I test whether adding small noise clues to a normal image model improves detection. Combining several models gave my best result.
+
+2. Why does this matter? Can't we just ask an AI whether a picture is fake?
+Answer: Fake pictures can mislead people. My detector is also AI, but I test it on pictures with known labels so I can measure how often it is right or wrong, rather than simply trusting an answer.
+
+3. You used two methods. What does each one help you see?
+Answer: The RGB model looks at how the picture appears. The SRM part brings out small noise patterns that may show how it was generated. Together, they give the detector different clues.
+
+4. Your results are very high. How did you check that the model wasn't just memorising the training pictures?
+Answer: I used separate training and validation folds. I also kept the final 20,000 test pictures untouched until the model choices were finished. This helps check performance on unseen pictures, although it does not prove the model will work on every new dataset.
+
+5. You mentioned an ensemble. What is that, and how did you combine the models' answers?
+Answer: An ensemble is several models working together. Each model gives probabilities for real and fake. I average those probabilities and choose the class with the higher average. This is called soft voting.
+
+6. What would you still need to test before using this on real-world pictures?
+Answer: I would test pictures from other image generators and datasets. I would also test lower-quality and compressed pictures to see whether the results stay reliable.
+
+
+PROJECT DEMO - MERIT LENS - 6 QUESTIONS
+
+1. What problem does your app solve?
+Answer: Written work can look good even when the student does not understand it. Merit Lens adds a short interview about the student's own work so the teacher can see what they understand.
+
+2. How does someone use your app?
+Answer: The teacher creates a task. The student uploads their work and answers short questions. The app saves the answers and makes a report for the teacher.
+
+3. Where do the questions come from?
+Answer: The AI reads the student's uploaded work and picks important ideas from it. The teacher's instructions help guide the questions.
+
+4. Who decides the final grade?
+Answer: The teacher. The AI can suggest a grade, but the teacher checks the evidence and can change it.
+
+5. Does a camera warning prove cheating?
+Answer: No. The camera check can make mistakes. A warning only asks the teacher to look more closely; it is not proof.
+
+6. What still needs improving?
+Answer: The avatar needs to look more natural. Camera checks and AI grading need wider testing. We also need proper login and access control before using it more widely.
+
+TRANSFER MODE - QUESTIONS AND SAMPLE ANSWERS
+
+MATLAB
+
+PAIR 1 - SLOPE
+
+Explain: If I give you two points, how do you find the slope?
+Good answer: I divide the change in y by the change in x: (y2 - y1) / (x2 - x1).
+
+Apply: Now the points are (2,4) and (2,9). What kind of line do you get?
+Good answer: Both x-values are 2, so the line is vertical: x = 2. The slope is undefined because the usual formula would divide by zero.
+
+PAIR 2 - A POINT ON A CURVE
+
+Explain: How do you check whether a point is on a curve?
+Good answer: I put its x and y values into the equation and check whether it is true.
+
+Apply: Now the curve is y = x^2. Is the point (2,5) on it?
+Good answer: No. When x is 2, x squared is 4, but the point has y = 5. It does not satisfy the equation.
+
+PAIR 3 - THE Y-AXIS CROSSING
+
+Explain: How do you find where a graph crosses the y-axis?
+Good answer: I set x to zero and calculate f(0). The point is (0, f(0)).
+
+Apply: The first function changes to f(x) = 2x^4 + 3x + 5. Where does it cross the y-axis now?
+Good answer: I still set x to zero. This gives 5, so the crossing point is (0,5).
+
+
+THESIS - DEEPFAKE IMAGE DETECTION
+
+PAIR 1 - USING TWO METHODS
+
+Explain: You used two methods. What does each one help you see?
+Good answer: The RGB model checks how the picture looks. The SRM branch brings out small noise patterns that may reveal generation traces. They can provide different clues.
+
+Apply: In a new test, adding SRM gives no improvement. What would you do?
+Good answer: I would check that the comparison used the same data and conditions. If the extra branch still gives no useful improvement, I would consider keeping the simpler RGB model instead of adding complexity without a benefit.
+
+PAIR 2 - TESTING ON UNSEEN PICTURES
+
+Explain: How did you check that the model wasn't just memorising the training pictures?
+Good answer: I used separate training and validation folds and kept the final test set untouched until model choices were finished. That tests performance on unseen pictures, although it does not prove the model will work on every new dataset.
+
+Apply: You discover that the final test pictures were used in training by mistake. How would you check the model now?
+Good answer: The old test score is no longer a clean check. I would use a new test set that was never used for training or model selection, and evaluate the finished model on it.
+
+PAIR 3 - ENSEMBLES
+
+Explain: You mentioned an ensemble. What is that, and how did you combine the models' answers?
+Good answer: Several models work together. Each gives real and fake probabilities. I average those probabilities and use the class with the higher average. That is soft voting.
+
+Apply: Two models give fake probabilities of 0.9 and 0.3. With equal weights, what fake probability does their ensemble give?
+Good answer: I add them and divide by two: (0.9 + 0.3) / 2 = 0.6, or 60 percent.
+
+
+PROJECT DEMO - MERIT LENS
+
+PAIR 1 - CHECKING UNDERSTANDING
+
+Explain: Why does your app add an interview after the written submission?
+Good answer: Written work can look good without real understanding. The interview checks whether the student can explain the ideas in their own work.
+
+Apply: A student's description looks excellent, but they cannot explain a main feature. What should the report show?
+Good answer: It should record the missing or unclear explanation and the actual answer. The written work and the interview evidence are different. A weak explanation alone does not prove cheating or who wrote the work.
+
+PAIR 2 - CAMERA WARNINGS
+
+Explain: Does a camera warning prove cheating?
+Good answer: No. The camera can make mistakes. It only gives the teacher something to check.
+
+Apply: A camera warning says there may be a phone, but the teacher checks and finds it was another object. What should the teacher do?
+Good answer: Treat it as a false warning and dismiss that concern. Do not lower the grade because of that mistaken signal; judge the actual work and answers.
+
+PAIR 3 - THE FINAL GRADE
+
+Explain: Who decides the final grade?
+Good answer: The teacher. The AI suggests a grade, and the teacher checks the evidence and can change it.
+
+Apply: The AI gives a low grade, but the submitted work meets the grading criteria. What should the teacher do?
+Good answer: Check the work against the criteria, identify where the AI made a mistake, and correct the grade. The AI suggestion is not the final decision.
+

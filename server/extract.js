@@ -1,8 +1,10 @@
 import { extname } from 'node:path'
 import mammoth from 'mammoth'
 import { PDFParse } from 'pdf-parse'
+import { TEXT_EXTENSIONS } from '../shared/uploads.js'
 
 export const MAX_TEXT = 60000
+export const MAX_DOCUMENT_TEXT = 200000
 export class HttpError extends Error {
   constructor(status, message) { super(message); this.status = status }
 }
@@ -18,19 +20,26 @@ export async function extractText(file, pasted) {
   const extension = extname(file.originalname).toLowerCase()
   let text
   try {
-    if (extension === '.txt') {
+    if (TEXT_EXTENSIONS.includes(extension)) {
       text = new TextDecoder('utf-8', { fatal: true }).decode(file.buffer)
+    } else if (extension === '.ipynb') {
+      const notebook = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(file.buffer))
+      if (!Array.isArray(notebook.cells)) throw new HttpError(422, 'This notebook has no readable cells. Export it as text or paste your work.')
+      text = notebook.cells.filter(cell => ['markdown', 'code'].includes(cell.cell_type)).map(cell => {
+        const source = Array.isArray(cell.source) ? cell.source.join('') : typeof cell.source === 'string' ? cell.source : ''
+        return '[' + cell.cell_type + ' cell]\n' + source
+      }).join('\n\n')
     } else if (extension === '.docx') {
       text = (await mammoth.extractRawText({ buffer: file.buffer })).value
     } else if (extension === '.pdf') {
       const parser = new PDFParse({ data: new Uint8Array(file.buffer) })
       try { text = (await parser.getText()).text } finally { await parser.destroy() }
-    } else throw new HttpError(415, 'Please choose a PDF, DOCX, or UTF-8 TXT file.')
+    } else throw new HttpError(415, 'Choose a PDF, DOCX, UTF-8 text/code file, CSV, or Jupyter notebook.')
   } catch (error) {
     if (error instanceof HttpError) throw error
-    throw new HttpError(422, 'This file could not be read. Try a text-based PDF, DOCX, UTF-8 TXT file, or paste your text.')
+    throw new HttpError(422, 'This file could not be read. Try a text-based PDF, DOCX, UTF-8 text/code file, notebook, or paste your text.')
   }
   text = text.replace(/\u0000/g, '').trim()
   if (text.length < 40) throw new HttpError(422, 'Not enough readable text was found. Scanned PDFs need OCR first; you can paste the assignment instead.')
-  return { text: requiredText(text, 'Extracted assignment text', MAX_TEXT, 40), filename: file.originalname.slice(0, 200) }
+  return { text: requiredText(text, 'Extracted assignment text', MAX_DOCUMENT_TEXT, 40), filename: file.originalname.slice(0, 200) }
 }

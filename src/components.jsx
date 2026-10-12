@@ -1,6 +1,9 @@
+import {hungarianText} from '../shared/hu-copy.js'
 import React from 'react'
 
 const paths = {
+  download: <path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4" />,
+  camera: <><path d="M4 6h4l2-3h4l2 3h4a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" /><circle cx="12" cy="13" r="4" /></>,
   arrow: <path d="M4 12h15M13 5l7 7-7 7" />,
   back: <path d="M20 12H5m6-7-7 7 7 7" />,
   mic: <><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M9 22h6" /></>,
@@ -35,9 +38,9 @@ export function Button({ children, variant = 'primary', className = '', loading,
 }
 export function ErrorNotice({ message, onRetry }) {
   if (!message) return null
-  return <div className="error-notice" role="alert"><span>{message}</span>{onRetry && <button onClick={onRetry}>Try again</button>}</div>
+  return <div className="error-notice" role="alert"><span>{document.documentElement.lang==='hu'?hungarianText(message):message}</span>{onRetry && <button onClick={onRetry}>Try again</button>}</div>
 }
-export function Loading({ label = 'Bringing things into focus…' }) { return <div className="loading-state" role="status"><span className="spinner" />{label}</div> }
+export function Loading({ label = 'Loading…' }) { return <div className="loading-state" role="status"><span className="spinner" />{label}</div> }
 export function Badge({ status, children }) {
   return <span className={`badge badge-${status?.toLowerCase() || 'neutral'}`}><i />{children || status?.toLowerCase()}</span>
 }
@@ -45,3 +48,8 @@ export function Wave({ active = false, className = '' }) {
   return <div className={`wave ${active ? 'wave-active' : ''} ${className}`} aria-hidden="true">{[12, 21, 34, 47, 30, 57, 40, 25, 49, 64, 36, 52, 29, 41, 20, 12].map((height, i) => <span key={i} style={{ '--height': `${height}px`, '--delay': `${i * 75}ms` }} />)}</div>
 }
 export function Empty({ title, children, icon = 'file' }) { return <div className="empty-state"><span className="icon-tile"><Icon name={icon} size={26} /></span><h3>{title}</h3><p>{children}</p></div> }
+
+export function ListMore({ total, limit, step = 3, onChange, label = 'items' }) {
+ if(total<=step)return null
+ return <div className="list-more">{limit<total?<button className="text-button" onClick={()=>onChange(limit+step)}>Show more {label}<Icon name="plus" size={14}/></button>:<button className="text-button" onClick={()=>onChange(step)}>Show fewer<Icon name="close" size={14}/></button>}</div>
+}

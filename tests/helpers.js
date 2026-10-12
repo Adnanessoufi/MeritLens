@@ -13,7 +13,7 @@ export async function setup(t, overrides = {}, dependencies = {}) {
   const app = createApp(db, config, dependencies)
   const server = await new Promise(resolve => { const server = app.listen(0, '127.0.0.1', () => resolve(server)) })
   const base = `http://127.0.0.1:${server.address().port}`
-  t.after(async () => { await new Promise(resolve => server.close(resolve)); db.close() })
+  t.after(async () => { app.locals.stopInterviewLifecycle?.(); await new Promise(resolve => server.close(resolve)); db.close() })
   async function request(path, { body, ...options } = {}) {
     const response = await fetch(`${base}/api${path}`, { ...options, headers: { ...(body instanceof FormData ? {} : { 'Content-Type': 'application/json' }), ...options.headers },
       body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(body) })
@@ -68,3 +68,6 @@ export function docxFixture(text = sample) {
   end.writeUInt32LE(directory.length, 12); end.writeUInt32LE(offset, 16)
   return Buffer.concat([...local, directory, end])
 }
+
+// Semantic evaluator fixture for supported explanations in sequence/lifecycle tests.
+export const supportedTransferOriginal = async (spec, original) => ({ explanationScore: 2, originalQuote: original, explanationRationale: 'The original concept is explained correctly.', feedback: '' })

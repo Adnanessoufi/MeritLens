@@ -1,3 +1,4 @@
+import {hungarianText} from '../shared/hu-copy.js'
 import { useCallback, useEffect, useState } from 'react'
 
 export async function api(path, options = {}) {
@@ -14,7 +15,7 @@ export async function api(path, options = {}) {
   }
   if (response.status === 204) return null
   const data = await response.json().catch(() => null)
-  if (!response.ok) throw new Error(data?.error || 'This request could not be completed. Please try again.')
+  if (!response.ok) throw new Error(localStorage.getItem('merit-lens-language')==='hu'?hungarianText(data?.error || 'This request could not be completed. Please try again.'):data?.error || 'This request could not be completed. Please try again.')
   return data
 }
 
@@ -44,5 +45,5 @@ export function useRoute() {
   }, [])
   return route
 }
-export const date = value => new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+export const date = value => new Date(value).toLocaleDateString(document.documentElement.lang||undefined, { month: 'short', day: 'numeric' })
 export const seconds = value => `${Math.round(value)}s`

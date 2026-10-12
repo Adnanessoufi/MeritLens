@@ -1,0 +1,16 @@
+import {test,expect} from '@playwright/test'
+test('teacher deletes and restores assignments; automatic interview replaces manual question controls',async({page})=>{
+ const created=await(await page.request.post('/api/assignments',{data:{title:'Delete workflow QA',brief:'Design a reading-list app and explain dictionary lookup, trade-offs and test cases.',concepts:['Dictionaries']}})).json()
+ await page.goto('/#/teacher/assignment/'+created.id)
+ await expect(page.locator('.assignment-rubric')).toBeVisible()
+ await expect(page.locator('.automatic-interview')).toHaveCount(0)
+ await expect(page.getByRole('textbox',{name:'Core concepts',exact:true})).toHaveCount(0)
+ await expect(page.getByRole('button',{name:'Generate questions',exact:true})).toHaveCount(0)
+ await expect(page.getByRole('button',{name:'Add your own question',exact:true})).toHaveCount(0)
+ await page.goto('/#/teacher')
+ await page.getByRole('button',{name:'Delete assignment: Delete workflow QA',exact:true}).click()
+ await expect(page.getByText('Assignment deleted',{exact:true})).toBeVisible()
+ await expect(page.getByRole('link',{name:/Delete workflow QA/})).toHaveCount(0)
+ await page.getByRole('button',{name:'Undo',exact:true}).click()
+ await expect(page.getByRole('link',{name:/Delete workflow QA/})).toBeVisible()
+})

@@ -1,0 +1,15 @@
+import {readFileSync} from 'node:fs'
+import {PROJECT_DEMO_ID} from '../shared/project-demo.js'
+import {now} from './db.js'
+const matlab=JSON.parse(readFileSync(new URL('./demo-materials/practicing-task.json',import.meta.url),'utf8'))
+export const demoAssignments=[
+ {id:'sample-matlab',title:'MATLAB practice',subject:'Computer aided mathematics',brief:'Solve the eight practice tasks in MATLAB. Submit your code and plots. 20 points.',instructions:matlab.instructions,filename:'Practicing_Assignment.pdf',reference:readFileSync(new URL('./demo-materials/practicing-answers.m',import.meta.url),'utf8'),rubric:matlab.weights.map((maxPoints,i)=>({name:'Question '+(i+1),maxPoints,description:'Correctly complete question '+(i+1)+' and its required parts, calculations and plots.'})),limit:6},
+ {id:'sample-thesis',title:'Thesis defence',subject:'Research',brief:'Submit your thesis or a clear thesis summary. Explain your research question, method, findings and limits.',instructions:'Submit your thesis or a clear thesis summary. Describe the problem, why it matters, the method you used, the main findings and their limits. Include what you personally did. The interview will ask about your own choices and evidence.',rubric:[{name:'Research question',maxPoints:4,description:'Clear research question and purpose.'},{name:'Method',maxPoints:6,description:'Appropriate method with justified choices.'},{name:'Findings',maxPoints:6,description:'Findings supported by evidence.'},{name:'Limits',maxPoints:4,description:'Limits, contribution and next steps.'}],reference:'',filename:'',limit:6},
+ {id:PROJECT_DEMO_ID,title:'Project demo defence',subject:'Project presentation',brief:'Submit a description of your demo project. Explain what you built and why in a short oral defence.',instructions:'Submit your own project description, like an application for a demo or hackathon. Explain the problem, users, main features, how the project works, your choices, your contribution and current limits. The interview uses up to 6 questions based on that description. Standard questions are independent; transfer pairs test a small change. The sample description is about Merit Lens and can be edited before submitting.',rubric:[{name:'Problem and users',maxPoints:4,description:'Clear problem, target users and need.'},{name:'How it works',maxPoints:6,description:'Coherent workflow and accurate feature claims.'},{name:'Design choices',maxPoints:4,description:'Reasons for key decisions and trade-offs.'},{name:'Testing and limits',maxPoints:6,description:'Evidence of testing, honest limits and realistic next steps.'}],reference:'',filename:'',limit:6}
+]
+export function installDemoAssignments(db){
+ for(const a of demoAssignments){
+  if(db.prepare('SELECT id FROM assignments WHERE id=?').get(a.id))continue
+  db.prepare('INSERT INTO assignments (id,title,subject,brief,concepts,created_at,rubric,instructions_text,instructions_filename,reference_answer,question_limit,timing_mode) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)').run(a.id,a.title,a.subject,a.brief,'[]',now(),JSON.stringify(a.rubric),a.instructions,a.filename,a.reference,a.limit,'adaptive')
+ }
+}

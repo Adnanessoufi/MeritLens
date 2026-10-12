@@ -1,0 +1,6 @@
+MediaPipe Tasks Vision 1.1.0
+Copyright Google LLC; package license Apache-2.0.
+Source: https://github.com/google-ai-edge/mediapipe
+License: https://www.apache.org/licenses/LICENSE-2.0
+Bundled runtime is copied from the pinned npm package @mediapipe/tasks-vision.
+Official model sources and exact SHA256 hashes are recorded in manifest.json.

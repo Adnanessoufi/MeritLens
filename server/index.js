@@ -1,19 +1,25 @@
+import {installDemoAssignments} from './demo-assignments.js'
 import express from 'express'
 import { resolve } from 'node:path'
 import { existsSync } from 'node:fs'
+import { createServer as createHttpServer } from 'node:http'
 import { getConfig } from './config.js'
 import { openDatabase, seed } from './db.js'
 import { createApp } from './app.js'
 
 const config = getConfig()
 const db = openDatabase(config.database)
-seed(db)
+if(config.database===':memory:'){seed(db);installDemoAssignments(db)}
+else if(!db.prepare('SELECT COUNT(*) n FROM assignments').get().n)installDemoAssignments(db)
 const app = createApp(db, config)
+const server = createHttpServer(app)
+server.on('close',()=>app.locals.stopInterviewLifecycle?.())
 const dev = process.argv.includes('--dev')
+let vite
 if (dev) {
   const { createServer } = await import('vite')
-  const vite = await createServer({
-    server: { middlewareMode: true, watch: { ignored: ['**/data/**', '**/.test-artifacts/**'] } },
+  vite = await createServer({
+    server: { middlewareMode: true, hmr: { server }, watch: { ignored: ['**/data/**', '**/.test-artifacts/**'] } },
     appType: 'spa',
   })
   app.use(vite.middlewares)
@@ -24,8 +30,8 @@ if (dev) {
 }
 const port = Number(process.env.PORT || 5173)
 const host = process.env.HOST || '127.0.0.1'
-const server = app.listen(port, host, () => {
-  console.log(`\n  Merit Lens → http://${host}:${port}\n  ${config.demo ? 'Demo analysis' : 'OpenAI analysis'} · ${config.elevenKey ? 'ElevenLabs voice' : 'Browser voice'} · SQLite\n`)
+server.listen(port, host, () => {
+  console.log(`\n  Merit Lens → http://${host}:${port}\n  ${config.demo ? 'Demo analysis' : 'OpenAI analysis'} · ${config.voiceProvider === 'openai' ? 'OpenAI voice' : config.voiceProvider === 'browser' ? 'Browser voice' : config.elevenKey ? 'ElevenLabs voice' : config.openaiKey ? 'OpenAI voice' : 'Browser voice'} · SQLite\n`)
 })
 server.on('error', error => { console.error(error.code === 'EADDRINUSE' ? `Port ${port} is in use. Set PORT in .env to another port.` : error.message); process.exit(1) })
-for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => server.close(() => { db.close(); process.exit(0) }))
+for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => server.close(async () => { await vite?.close(); db.close(); process.exit(0) }))

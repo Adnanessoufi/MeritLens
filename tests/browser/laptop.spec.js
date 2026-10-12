@@ -1,0 +1,93 @@
+import { test, expect } from '@playwright/test'
+import { installFakeCamera, startInterview } from './devices.js'
+test.beforeEach(async ({ page }) => { await installFakeCamera(page) })
+import { transferWork } from '../../shared/transfer-fixtures.js'
+
+const shots = '.test-artifacts/screenshots'
+test('laptop interview uses adaptive timing and preserves a current-question extension', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 })
+  await page.addInitScript(() => {
+    window.SpeechSynthesisUtterance = class { constructor(text) { this.text = text } }
+    Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { speak(utterance) { setTimeout(() => utterance.onend?.(), 20) }, cancel() {} } })
+  })
+  const created = await page.request.post('/api/assignments', { data: { title: 'Laptop timing QA', subject: 'Computer science', brief: transferWork.brief, concepts: transferWork.concepts, timingMode: 'adaptive' } })
+  const assignment = await created.json()
+  await page.goto('/#/student/' + assignment.id)
+  await page.getByLabel('Your name', { exact: true }).fill('Laptop timing QA · fictional')
+  await page.getByRole('button', { name: 'Paste text', exact: true }).click()
+  await page.getByLabel('Assignment text').fill(transferWork.text)
+  await page.getByRole('button', { name: 'Upload & prepare my defence' }).click()
+  await expect(page.getByText('Adaptive · 20–60 seconds', { exact: true })).toBeVisible()
+  await startInterview(page)
+  await page.getByRole('button', { name: 'See Question', exact: true }).click()
+  const sessionId = page.url().split('/session/')[1]
+  const firstSession = await (await page.request.get('/api/sessions/' + sessionId)).json()
+  const firstBudget = firstSession.duration
+  expect([20, 30, 45, 60]).toContain(firstBudget)
+  await expect(page.locator('.timing-label')).toContainText(firstBudget + 's')
+  await page.getByRole('button', { name: '+15 seconds', exact: true }).click()
+  await expect(page.locator('.timing-label')).toContainText((firstBudget + 15) + 's')
+  await page.screenshot({ path: shots + '/laptop-interview.png', fullPage: false })
+  const skipBounds = await page.getByRole('button', { name: 'Skip Defence', exact: true }).boundingBox()
+  expect(skipBounds.y + skipBounds.height).toBeLessThanOrEqual(768)
+  await page.reload()
+  await startInterview(page, 'Resume oral defence')
+  await expect(page.locator('.timing-label')).toContainText((firstBudget + 15) + 's')
+  await page.getByRole('button', { name: 'See Question', exact: true }).click()
+  await page.getByRole('button', { name: 'Can’t speak? Type your answer' }).click()
+  await page.getByLabel('Your answer', { exact: true }).fill('I chose a dictionary to access an ISBN directly instead of scanning each book. This trades extra memory for average constant-time key lookup; collisions can make the worst case slower.')
+  await page.getByRole('button', { name: 'Send answer' }).click()
+  await expect(page.locator('.question-counter')).toContainText('Question 2')
+  const secondSession = await (await page.request.get('/api/sessions/' + sessionId)).json()
+  expect([20, 30, 45, 60]).toContain(secondSession.duration)
+  expect(secondSession.question.id).not.toBe(firstSession.question.id)
+  await expect(page.locator('.timing-label')).toContainText(secondSession.duration + 's')
+  await page.getByRole('button', { name: 'Skip Defence', exact: true }).click()
+  await page.getByRole('button', { name: 'Yes, skip defence' }).click()
+})
+
+test('production laptop home, transfer examples and report tabs keep primary actions visible', async ({ page }) => {
+  test.skip(process.env.CAPTURE_LAPTOP !== '1', 'Opt-in layout verification of the running demo.')
+  await page.setViewportSize({ width: 1366, height: 768 })
+  const errors = []; page.on('pageerror', error => errors.push(error.message))
+  const origin = 'http://127.0.0.1:5175'
+  await page.goto(origin + '/#/')
+  await expect(page.getByRole('heading', { name: 'Show the thinking behind the work.' })).toBeVisible()
+  await expect(page.locator('.welcome-role')).toHaveCount(2)
+  await expect(page.getByText('Gap flagged', { exact: true })).toHaveCount(0)
+  for (const link of await page.locator('.welcome-role, .welcome-examples a').all()) {
+    const box = await link.boundingBox(); expect(box.y + box.height).toBeLessThanOrEqual(768)
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(768)
+  await page.screenshot({ path: shots + '/laptop-home.png', fullPage: false })
+  await page.goto(origin + '/#/transfer')
+  await expect(page.locator('.transfer-example')).toHaveCount(3)
+  for (const link of await page.locator('.transfer-example .button').all()) {
+    const box = await link.boundingBox(); expect(box.y + box.height).toBeLessThanOrEqual(768)
+  }
+  await page.screenshot({ path: shots + '/laptop-transfer.png', fullPage: false })
+  await page.getByRole('button', { name: 'Generated questions', exact: true }).click()
+  await expect(page.locator('.generated-pair')).toHaveCount(3)
+  await page.locator('.generated-pair summary').first().click()
+  await expect(page.locator('.generated-pair').first()).toContainText('Explain:')
+  await page.getByRole('button', { name: 'Validation & limitations', exact: true }).click()
+  await expect(page.locator('tbody tr')).toHaveCount(13)
+  const demo = await (await page.request.get(origin + '/api/transfer/demo')).json()
+  const weak = demo.examples.find(example => example.kind === 'weak')
+  await page.goto(origin + '/#/teacher/report/' + weak.reportId)
+  await expect(page.locator('.transfer-pair:not([hidden])')).toHaveCount(1)
+  await page.locator('.report-extra > summary').filter({hasText:/^Explain & apply results$/}).click()
+  await page.locator('.pair-tabs button').nth(2).click()
+  await expect(page.locator('.transfer-pair:not([hidden]) h3')).toHaveText('Testing')
+  await expect(page.locator('.compact-answer').first()).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Interview results', exact: true })).toBeVisible()
+  await page.locator('.report-extra').filter({has:page.locator(':scope > summary').filter({hasText:/^Teacher review$/})}).evaluate(node=>{node.open=true})
+  await page.getByLabel('Private teacher notes').fill('Unsaved fictional laptop QA draft')
+  await page.locator('.report-extra').filter({has:page.locator(':scope > summary').filter({hasText:/^Teacher review$/})}).evaluate(node=>{node.open=false})
+  await page.locator('.report-extra').filter({has:page.locator(':scope > summary').filter({hasText:/^Teacher review$/})}).evaluate(node=>{node.open=true})
+  await expect(page.getByLabel('Private teacher notes')).toHaveValue('Unsaved fictional laptop QA draft')
+  await page.locator('.report-extra').filter({has:page.locator(':scope > summary').filter({hasText:/^Teacher review$/})}).evaluate(node=>{node.open=false})
+  await page.locator('.pair-tabs button').first().click()
+  await page.screenshot({ path: shots + '/laptop-report.png', fullPage: false })
+  expect(errors).toEqual([])
+})

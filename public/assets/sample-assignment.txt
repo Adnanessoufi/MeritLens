@@ -1,0 +1,6 @@
+Reading-list application
+
+Build a Python reading-list application that stores books by ISBN, supports adding and finding books, and handles duplicate ISBNs and missing books safely.
+Explain the data structure choice, average and worst-case lookup complexity, and test cases for duplicates, missing books and empty input.
+Grading criteria: correctness 50 points; explanation of design and trade-offs 30 points; requirements and tests 20 points.
+Important concepts: dictionaries, search complexity, testing.

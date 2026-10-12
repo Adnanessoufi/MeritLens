@@ -1,0 +1,14 @@
+{
+  "instructions": "Computer aided mathematics and visualization \u2014 MATLAB practice (20 points)\nSubmit your MATLAB code and the required plots.\n1. (2p) True or false? Justify: f(x)=2*x^4+3*x-3 intersects the y-axis at (0,3).\n2. (1p) True or false? Justify: f(x)=5*x-6 goes through A=(2,4).\n3. (6p) Let f(x)=3*x^6-2.9*x^5-4.9*x^4+2.7*x^3+0.9*x^2+1.1*x+0.5.\n(a) Plot f. (1p)\n(b) Mark its real zeros. (1p)\n(c) Show why x=0 is not a zero. (1p)\n(d) Mark the point at x=1.23 without a special Point command. (1p)\n(e) Draw the tangent at x=1.23 using the derivative, without a special Tangent command. (1p)\n(f) Plot the restriction g(x)=f(x) on [0.2,1.5]. (1p)\n4. (1p) Find the slope through A=(2,4) and B=(3,-2).\n5. (2p) True or false? The zeros of a polynomial f give the zeros of its derivative. Justify.\n6. (3p) Let x^3+y^3-5*x*y-x^2+1=0.\n(a) Plot the implicit curve in blue on [-10,10] by [-10,10]. (2p)\n(b) Check whether P=(1,4) is on the curve using the equation. (1p)\n7. (3p) Let z=sqrt(1-x^2-0.5*y^2).\n(a) Plot the surface on its real domain. (2p)\n(b) Mark the point with x=0.5 and y=0.2. (1p)\n8. (2p) Plot these planes using different colours: x+y-z=0; x-2*y+3*z=4; 2*x-0.5*y+4*z=-2.",
+  "weights": [
+    2,
+    1,
+    6,
+    1,
+    2,
+    3,
+    3,
+    2
+  ],
+  "source": "Practicing_Assignment.pdf"
+}

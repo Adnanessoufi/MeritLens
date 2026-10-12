@@ -1,0 +1,8 @@
+{
+  "fictional": true,
+  "text": "Szia, Adnane vagyok, az AI kérdeződ. Beszélgessünk a munkádról. A munkádban ezt írtad: „My Python reading-list application stores books in dictionaries with ISBN keys.”. Elmagyaráznád a gondolatmenetedet?",
+  "question": "A munkádban ezt írtad: „My Python reading-list application stores books in dictionaries with ISBN keys.”. Elmagyaráznád a gondolatmenetedet?",
+  "sourceQuote": "My Python reading-list application stores books in dictionaries with ISBN keys.",
+  "bytes": 244224,
+  "description": "AI-generated generic interviewer voice. No student recording or uploaded document. This cached fixture makes browser QA repeatable without keys or network."
+}
