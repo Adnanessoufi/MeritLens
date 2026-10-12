@@ -1,0 +1,42 @@
+# Free demo: SQLite records reset when Render restarts or redeploys the service.
+services:
+  - type: web
+    name: merit-lens-demo
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: 22.18.0
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: TRUST_PROXY
+        value: "1"
+      - key: DATABASE_PATH
+        value: ./data/merit-lens.sqlite
+      - key: DEMO_MODE
+        value: auto
+      - key: REQUIRE_DEMO_ACCESS_PASSWORD
+        value: "true"
+      - key: DEMO_ACCESS_PASSWORD
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4.1-mini
+      - key: VOICE_PROVIDER
+        value: auto
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: ELEVENLABS_VOICE_ID
+        value: UgBBYS2sOqTuMpoF3BR0
+      - key: ELEVENLABS_TTS_MODEL
+        value: eleven_v4_turbo
+      - key: ELEVENLABS_STT_MODEL
+        value: scribe_v2

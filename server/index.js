@@ -28,7 +28,7 @@ if (dev) {
   app.use(express.static(resolve('dist')))
   app.get('/{*path}', (req, res) => res.sendFile(resolve('dist/index.html')))
 }
-const port = Number(process.env.PORT || 5173)
+const port = Number(process.env.PORT || 5175)
 const host = process.env.HOST || '127.0.0.1'
 server.listen(port, host, () => {
   console.log(`\n  Merit Lens → http://${host}:${port}\n  ${config.demo ? 'Demo analysis' : 'OpenAI analysis'} · ${config.voiceProvider === 'openai' ? 'OpenAI voice' : config.voiceProvider === 'browser' ? 'Browser voice' : config.elevenKey ? 'ElevenLabs voice' : config.openaiKey ? 'OpenAI voice' : 'Browser voice'} · SQLite\n`)

@@ -1,3 +1,4 @@
+import { configureHosting } from './hosting.js'
 import {offTopicFeedback,offTopicSummary} from '../shared/off-topic.js'
 import {createReportLocalizer} from './localization.js'
 import {learningConceptVisible} from '../shared/report-results.js'
@@ -29,6 +30,7 @@ import { QUESTION_DURATION_SECONDS, RESPONSE_TIME_OPTIONS, withQuestionTiming } 
 
 export function createApp(db, config, dependencies = {}) {
   const app = express()
+  configureHosting(app, db, config)
   const savedMode = db.prepare("SELECT value FROM settings WHERE key = 'assessment_mode'").get()?.value
   if (savedMode) config.demo = savedMode === 'demo'
   const savedVoice = db.prepare("SELECT value FROM settings WHERE key = 'voice_provider'").get()?.value
