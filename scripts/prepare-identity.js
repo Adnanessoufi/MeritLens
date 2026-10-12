@@ -1,6 +1,7 @@
 import {mkdir,copyFile,readdir,readFile,writeFile} from 'node:fs/promises'
 import {createHash} from 'node:crypto'
 await mkdir('public/identity/models',{recursive:true})
+await copyFile('node_modules/@vladmandic/face-api/LICENSE','public/identity/LICENSE')
 await copyFile('node_modules/@vladmandic/face-api/dist/face-api.esm.js','public/identity/face-api.esm.js')
 const allowed=['tiny_face_detector','face_landmark_68_tiny','face_recognition']
 const manifest=[]
