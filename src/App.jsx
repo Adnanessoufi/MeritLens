@@ -1,6 +1,6 @@
 import {PROJECT_DEMO_ID} from '../shared/project-demo.js'
 import React, { useEffect, useState } from 'react'
-import { useResource, useRoute } from './api.js'
+import { prefetchResource, useResource, useRoute } from './api.js'
 import { Logo, Icon, ErrorNotice, Loading } from './components.jsx'
 import { ProviderSettings } from './Assessment.jsx'
 import { MeetingReview } from './Meeting.jsx'
@@ -13,6 +13,9 @@ import { languages, useStudentTranslation } from './i18n.js'
 export default function App() {
   const route = useRoute()
   const config = useResource('/config')
+  useEffect(() => {
+    for (const path of ['/assignments', '/submissions']) prefetchResource(path).catch(() => {})
+  }, [])
   useEffect(() => { const refresh = () => config.reload(); window.addEventListener('merit-lens-config', refresh); return () => window.removeEventListener('merit-lens-config', refresh) }, [config.reload])
   const [language, setLanguage] = useState(() => {
     const saved = localStorage.getItem('merit-lens-language')
@@ -25,10 +28,10 @@ export default function App() {
   const parts = route.split('/').filter(Boolean)
   let content
   if (route === '/') content = <Landing />
-  else if (route === '/transfer') content = <StudentUpload key={route} config={config.data} language={language} initialMode="transfer" challengeEntry />
+  else if (route === '/transfer') content = <StudentUpload key={route} config={config.data || {}} language={language} initialMode="transfer" challengeEntry />
   else if (route === '/transfer/examples') content = <TransferChallenge config={config.data} />
   else if (route === '/showcase') content = <Showcase config={config.data} />
-  else if (parts[0] === 'student') content = <StudentUpload key={route} assignmentId={parts[1]==='sample-python'&&parts[2]==='demo'?PROJECT_DEMO_ID:parts[1]} prefillSample={parts[2]==='demo'} config={config.data} language={language} initialMode={parts[2] === 'standard' ? 'standard' : 'transfer'} />
+  else if (parts[0] === 'student') content = <StudentUpload key={route} assignmentId={parts[1]==='sample-python'&&parts[2]==='demo'?PROJECT_DEMO_ID:parts[1]} prefillSample={parts[2]==='demo'} config={config.data || {}} language={language} initialMode={parts[2] === 'standard' ? 'standard' : 'transfer'} />
   else if (parts[0] === 'session' && parts[1]) content = <Defence key={parts[1]} sessionId={parts[1]} config={config.data} language={language} onLanguage={value => { localStorage.setItem('merit-lens-language', value); setLanguage(value) }} />
   else if (parts[0] === 'complete' && parts[1]) content = <Completion sessionId={parts[1]} />
   else if (route === '/teacher/settings') content = <div className="page settings-page"><h1>Settings</h1><ProviderSettings config={config.data} expanded /><details className="data-details demo-validation-link"><summary>Demo validation</summary><a className="text-button" href="#/transfer/examples">Saved strong, partial and weak examples</a></details></div>
@@ -49,7 +52,7 @@ export default function App() {
         </nav>
       </header>
       <main key={route}>
-        {route === '/' ? content : config.error ? <div className="page"><ErrorNotice message={config.error} onRetry={config.reload} /></div> : !config.data ? <Loading /> : content}
+        {(route === '/' || route === '/teacher' || parts[0] === 'student') && !config.error ? content : config.error ? <div className="page"><ErrorNotice message={config.error} onRetry={config.reload} /></div> : !config.data ? <Loading /> : content}
       </main>
 
     </div>
@@ -65,7 +68,7 @@ function Landing() {
         <div><h2>Student</h2><span className="button button-primary">Enter<Icon name="arrow" size={18} /></span></div>
       </a>
       <a className="entry-card" href="#/teacher" aria-label="Teacher workspace">
-        <img src="/assets/teacher-entry.png" alt="Teacher in a classroom" />
+        <img src="/assets/teacher-entry.webp" alt="Teacher in a classroom" />
         <div><h2>Teacher</h2><span className="button button-primary">Enter<Icon name="arrow" size={18} /></span></div>
       </a>
     </div>
