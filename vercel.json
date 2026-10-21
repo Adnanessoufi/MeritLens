@@ -6,7 +6,7 @@
   "functions": {
     "api/index.js": {
       "maxDuration": 300,
-      "includeFiles": "{server/**,shared/**,public/fonts/**,node_modules/@libsql/**,node_modules/@libsql/client/**}"
+      "includeFiles": "{server/**,shared/**,public/fonts/**,node_modules/@libsql/**,node_modules/@napi-rs/**}"
     }
   },
   "rewrites": [
