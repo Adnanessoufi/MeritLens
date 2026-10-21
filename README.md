@@ -49,6 +49,6 @@ The app uses React and Vite, with an Express API and SQLite. Vercel hosting uses
 
 Run `npm test` and `npm run build` to check changes. Browser checks use `npm run test:ui`, installed Chrome and an in-memory database.
 
-[Hosting setup](docs/DEPLOYMENT.md) · [Interview modes](docs/TRANSFER_CHALLENGE.md)
+[Interview modes](docs/TRANSFER_CHALLENGE.md)
 
 Suggested grades need teacher review. Camera warnings do not prove cheating.
