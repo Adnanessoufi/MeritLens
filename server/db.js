@@ -11,6 +11,12 @@ export const now = () => new Date().toISOString()
 export function openDatabase(path, cloud = null) {
   if (!cloud && path !== ':memory:') mkdirSync(dirname(resolve(path)), { recursive: true })
   const db = cloud ? openCloudDatabase(cloud) : new DatabaseSync(path)
+  // Hosted instances share a migrated database; avoid repeating network schema checks.
+  const schemaVersion = 20261021
+  if (cloud) {
+    try { if (db.prepare("SELECT value FROM settings WHERE key = 'schema_version'").get()?.value === String(schemaVersion)) return db }
+    catch (error) { if (!/no such table/i.test(error.message)) throw error }
+  }
   db.exec(`
     PRAGMA foreign_keys = ON;
     PRAGMA journal_mode = WAL;
@@ -66,8 +72,11 @@ export function openDatabase(path, cloud = null) {
   const columns = db.prepare('PRAGMA table_info(sessions)').all().map(column => column.name)
   if (!columns.includes('language')) db.exec("ALTER TABLE sessions ADD COLUMN language TEXT NOT NULL DEFAULT 'en'")
   if (!columns.includes('defence_skipped')) db.exec('ALTER TABLE sessions ADD COLUMN defence_skipped INTEGER NOT NULL DEFAULT 0')
+  const tableColumns = new Map([['sessions', new Set(columns)]])
   const migrate = (table, name, definition) => {
-    if (!db.prepare('PRAGMA table_info(' + table + ')').all().some(c => c.name === name)) db.exec('ALTER TABLE ' + table + ' ADD COLUMN ' + name + ' ' + definition)
+    if (!tableColumns.has(table)) tableColumns.set(table, new Set(db.prepare('PRAGMA table_info(' + table + ')').all().map(c => c.name)))
+    const known = tableColumns.get(table)
+    if (!known.has(name)) { db.exec('ALTER TABLE ' + table + ' ADD COLUMN ' + name + ' ' + definition); known.add(name) }
   }
   migrate('assignments', 'deleted_at', 'TEXT')
   migrate('assignments', 'challenge_mode', "TEXT NOT NULL DEFAULT 'standard'")
@@ -107,6 +116,7 @@ export function openDatabase(path, cloud = null) {
   migrate('reports', 'released_at', 'TEXT')
   migrate('reports', 'evidence_hash', "TEXT NOT NULL DEFAULT ''")
   migrate('reports', 'receipt_created_at', 'TEXT')
+  if (cloud) db.prepare("INSERT INTO settings (key,value) VALUES ('schema_version',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(String(schemaVersion))
   return db
 }
 

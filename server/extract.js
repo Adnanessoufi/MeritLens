@@ -1,6 +1,5 @@
 import { extname } from 'node:path'
 import mammoth from 'mammoth'
-import { PDFParse } from 'pdf-parse'
 import { TEXT_EXTENSIONS } from '../shared/uploads.js'
 
 export const MAX_TEXT = 60000
@@ -32,6 +31,7 @@ export async function extractText(file, pasted) {
     } else if (extension === '.docx') {
       text = (await mammoth.extractRawText({ buffer: file.buffer })).value
     } else if (extension === '.pdf') {
+      const { PDFParse } = await import('pdf-parse')
       const parser = new PDFParse({ data: new Uint8Array(file.buffer) })
       try { text = (await parser.getText()).text } finally { await parser.destroy() }
     } else throw new HttpError(415, 'Choose a PDF, DOCX, UTF-8 text/code file, CSV, or Jupyter notebook.')

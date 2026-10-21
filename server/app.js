@@ -4,7 +4,6 @@ import {createReportLocalizer} from './localization.js'
 import {learningConceptVisible} from '../shared/report-results.js'
 import {preparedInterview} from './prepared-interviews.js'
 import {numericSuggestedGrade} from '../shared/grade-score.js'
-import {renderReportPdf} from './report-pdf.js'
 import { responseKind, conversationLead } from '../shared/conversation.js'
 import express from 'express'
 import multer from 'multer'
@@ -498,6 +497,7 @@ export function createApp(db, config, dependencies = {}) {
   app.get('/api/reports/:id/download',async(req,res)=>{
     const original=readReport(req.params.id)
     const report=await localizeReport(original,reportLanguage(req,original))
+    const {renderReportPdf}=await import('./report-pdf.js')
     const pdf=await renderReportPdf(report)
     const filename='merit-lens-report-'+report.id.replace(/[^a-zA-Z0-9-]/g,'')+'.pdf'
     res.set({'Content-Type':'application/pdf','Content-Disposition':'attachment; filename="'+filename+'"','Cache-Control':'no-store'})

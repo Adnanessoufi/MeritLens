@@ -49,7 +49,7 @@ export default function App() {
         </nav>
       </header>
       <main key={route}>
-        {config.error ? <div className="page"><ErrorNotice message={config.error} onRetry={config.reload} /></div> : !config.data ? <Loading /> : content}
+        {route === '/' ? content : config.error ? <div className="page"><ErrorNotice message={config.error} onRetry={config.reload} /></div> : !config.data ? <Loading /> : content}
       </main>
 
     </div>

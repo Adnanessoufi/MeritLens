@@ -12,6 +12,6 @@ export default async function handler(req, res) {
     if (!db.prepare('SELECT COUNT(*) n FROM assignments').get().n) installDemoAssignments(db)
     app = createApp(db, config)
   }
-  await app.locals.sweepInterviewLifecycle()
+  if (!['/api/config', '/healthz'].includes(req.url.split('?')[0])) await app.locals.sweepInterviewLifecycle()
   return app(req, res)
 }
