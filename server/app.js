@@ -70,7 +70,7 @@ export function createApp(db, config, dependencies = {}) {
   app.use(express.json({ limit: '256kb' }))
 
   app.get('/api/config', (req, res) => res.json({
-    mode: config.demo ? 'demo' : 'live', aiConfigured: Boolean(config.openaiKey),
+    largePdfClientExtraction: Boolean(config.serverless), mode: config.demo ? 'demo' : 'live', aiConfigured: Boolean(config.openaiKey),
     voice: getVoiceProvider(config), voiceName:getVoiceProvider(config)==='elevenlabs'?(config.elevenVoiceName||'Selected voice'):getVoiceProvider(config)==='openai'?(config.openaiVoice||'coral'):'Browser', elevenlabsConfigured: Boolean(config.elevenKey),
     avatarConfigured: true, avatarProvider: 'local-mouth',
     storage: 'sqlite', maxFileMB: 10, maxTextCharacters: MAX_TEXT, maxDocumentCharacters: MAX_DOCUMENT_TEXT, providerHealth,
@@ -329,7 +329,7 @@ export function createApp(db, config, dependencies = {}) {
     db.prepare('UPDATE sessions SET language = ?, bank = ?, current = ? WHERE id = ?').run(language, JSON.stringify(bank), JSON.stringify(current), session.id)
     res.json(sessionView(db, session.id))
   }))
-  installInterviewLifecycle(app,db,ai,busy)
+  installInterviewLifecycle(app,db,ai,busy,{serverless:config.serverless})
   app.post('/api/sessions/:id/skip-defence', lock(req => `session:${req.params.id}`, async (req, res) => {
     const session = getSession(db, req.params.id)
     if (session.status === 'active') db.prepare("UPDATE sessions SET status = 'reporting', defence_skipped = 1, current = '{}', question_started_at = NULL, response_ended_at = NULL WHERE id = ?").run(session.id)

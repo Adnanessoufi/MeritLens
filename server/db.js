@@ -1,4 +1,5 @@
 import { DatabaseSync } from 'node:sqlite'
+import { openCloudDatabase } from './cloud-db.js'
 import { mkdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { randomUUID } from 'node:crypto'
@@ -7,9 +8,9 @@ import { QUESTION_DURATION_SECONDS } from '../shared/timer.js'
 export const id = () => randomUUID()
 export const now = () => new Date().toISOString()
 
-export function openDatabase(path) {
-  if (path !== ':memory:') mkdirSync(dirname(resolve(path)), { recursive: true })
-  const db = new DatabaseSync(path)
+export function openDatabase(path, cloud = null) {
+  if (!cloud && path !== ':memory:') mkdirSync(dirname(resolve(path)), { recursive: true })
+  const db = cloud ? openCloudDatabase(cloud) : new DatabaseSync(path)
   db.exec(`
     PRAGMA foreign_keys = ON;
     PRAGMA journal_mode = WAL;

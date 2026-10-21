@@ -1,3 +1,4 @@
+import { appendUpload } from './upload-file.js'
 import {QuestionCountSelect} from './Assessment.jsx'
 import {numericSuggestedGrade} from '../shared/grade-score.js'
 import React,{useState,useRef,useEffect} from 'react'
@@ -12,7 +13,7 @@ function RubricRows({rows,onChange}){
 }
 async function readTeacherFile(file,kind,subject=''){
  if(!file)return null
- const body=new FormData();body.append('file',file);body.append('kind',kind);body.append('subject',subject);body.append('language',document.documentElement.lang==='hu'?'hu':'en')
+ const body=new FormData();const config=await api('/config');await appendUpload(body,file,config.largePdfClientExtraction);body.append('kind',kind);body.append('subject',subject);body.append('language',document.documentElement.lang==='hu'?'hu':'en')
  return api('/assignments/prepare',{method:'POST',body})
 }
 function FileButton({label,onFile,disabled,compact=false}) {return <label className={'button button-white file-button'+(compact?' file-button-compact':'')+(disabled?' file-disabled':'')}><Icon name="upload" size={16}/>{label}<input aria-label={label} type="file" accept={UPLOAD_ACCEPT} disabled={disabled} onChange={e=>{onFile(e.target.files[0]);e.target.value=''}}/></label>}

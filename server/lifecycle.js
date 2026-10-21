@@ -1,7 +1,7 @@
 import {getSession,sessionView,finalizeReport} from './flow.js'
 import {HttpError} from './extract.js'
 import {now} from './db.js'
-export function installInterviewLifecycle(app,db,ai,busy){
+export function installInterviewLifecycle(app,db,ai,busy,{serverless=false}={}){
  const running=new Set()
  const read=session=>JSON.parse(session.meeting||'{}')
  const save=(id,meeting)=>db.prepare('UPDATE sessions SET meeting=? WHERE id=?').run(JSON.stringify(meeting),id)
@@ -17,14 +17,16 @@ export function installInterviewLifecycle(app,db,ai,busy){
    return true
   }finally{busy.delete(key);running.delete(id)}
  }
- function sweep(){
+ async function sweep(){
+  const pending=[]
   const rows=db.prepare("SELECT id,meeting FROM sessions WHERE status IN ('active','held')").all()
   for(const row of rows){const lease=JSON.parse(row.meeting||'{}').lifecycle;if(!lease?.lastSeen)continue
    const elapsed=Date.now()-Date.parse(lease.lastSeen),departed=lease.departingAt&&Date.now()-Date.parse(lease.departingAt)>=10000
-   if(departed||elapsed>=30000)end(row.id,departed?'Student left the interview':'Interview connection ended').catch(()=>{})
+   if(departed||elapsed>=30000)pending.push(end(row.id,departed?'Student left the interview':'Interview connection ended').catch(()=>{}))
   }
+  await Promise.all(pending)
  }
- const timer=setInterval(()=>{try{sweep()}catch{clearInterval(timer)}},2000);timer.unref();app.locals.stopInterviewLifecycle=()=>clearInterval(timer)
+ const timer=serverless?null:setInterval(()=>{sweep().catch(()=>clearInterval(timer))},2000);timer?.unref();app.locals.stopInterviewLifecycle=()=>clearInterval(timer)
  app.post('/api/sessions/:id/presence',(req,res)=>{
   const session=getSession(db,req.params.id);if(!['active','held'].includes(session.status))return res.json({open:false})
   const meeting=read(session);draft(session,req.body,meeting)

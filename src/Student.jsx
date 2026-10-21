@@ -1,3 +1,4 @@
+import { appendUpload } from './upload-file.js'
 import {createSpeakerMismatchTracker} from '../shared/speaker-check.js'
 import {PROJECT_DEMO_ID,projectSampleText} from '../shared/project-demo.js'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
@@ -55,7 +56,7 @@ export function StudentUpload({ assignmentId, config, language, challengeEntry =
       body.append('student', student)
       body.append('language', language)
       body.append('requestId', requestId.current)
-      if (tab === 'file') body.append('file', file)
+      if (tab === 'file') await appendUpload(body, file, config.largePdfClientExtraction)
       else body.append('text', text)
       const session = await api('/submissions', { method: 'POST', body })
       rememberSession(session); navigate(`/session/${session.id}`)

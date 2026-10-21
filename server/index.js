@@ -8,7 +8,7 @@ import { openDatabase, seed } from './db.js'
 import { createApp } from './app.js'
 
 const config = getConfig()
-const db = openDatabase(config.database)
+const db = openDatabase(config.database, config.cloudDatabase)
 if(config.database===':memory:'){seed(db);installDemoAssignments(db)}
 else if(!db.prepare('SELECT COUNT(*) n FROM assignments').get().n)installDemoAssignments(db)
 const app = createApp(db, config)

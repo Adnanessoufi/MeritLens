@@ -2,6 +2,8 @@ export function getConfig(env = process.env) {
   const demo = env.DEMO_MODE === 'true' || (env.DEMO_MODE !== 'false' && !env.OPENAI_API_KEY)
   return {
     demo,
+    serverless: env.VERCEL === '1',
+    cloudDatabase: env.TURSO_DATABASE_URL ? { url: env.TURSO_DATABASE_URL, authToken: env.TURSO_AUTH_TOKEN || '' } : null,
     trustProxy: env.TRUST_PROXY === '1',
     demoAccessPassword: env.DEMO_ACCESS_PASSWORD || '',
     requireDemoAccessPassword: env.REQUIRE_DEMO_ACCESS_PASSWORD === 'true',
