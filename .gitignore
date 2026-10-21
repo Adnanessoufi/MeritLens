@@ -50,4 +50,19 @@ tmp/
 
 .vercel/
 .vercel
-.env*
+
+# Local tools and presentation files
+.agents/
+skills-lock.json
+/scripts/calibrate-understanding.js
+/scripts/install-requested-demo-assignments.js
+/scripts/live-rehearsal.js
+/scripts/prepare-followup.js
+/scripts/prepare-showcase.js
+/scripts/prepare-transfer.js
+/pitch/Meritlens_GigaHack_2026_Pitch.pdf
+/screenshots/defence-desktop.png
+/screenshots/report-desktop.png
+/screenshots/teacher-desktop.png
+/public/assets/teacher-entry.png
+/public/assets/sample-assignment.txt
